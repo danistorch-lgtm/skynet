@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skynet — Selecionar Marca</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0c10;
+    --bg2: #111318;
+    --bg3: #181c24;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.14);
+    --text: #e8eaf0;
+    --text2: #8b8fa8;
+    --text3: #555870;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Syne', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 20px;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+  }
+
+  .container { position: relative; z-index: 1; width: 100%; max-width: 680px; }
+
+  .header { text-align: center; margin-bottom: 48px; }
+
+  .logo {
+    font-size: 42px;
+    font-weight: 800;
+    letter-spacing: -1.5px;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+  .logo span { color: #5b8fff; }
+
+  .tagline {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--text3);
+  }
+
+  .cards { display: flex; flex-direction: column; gap: 14px; }
+
+  .brand-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .brand-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--accent);
+    border-radius: 14px 0 0 14px;
+  }
+
+  .brand-card:hover {
+    border-color: var(--border2);
+    transform: translateY(-2px);
+    background: var(--bg3);
+  }
+
+  .brand-card:hover .arrow { transform: translateX(4px); opacity: 1; }
+
+  .brand-info { display: flex; align-items: center; gap: 18px; }
+
+  .brand-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: 800;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+
+  .brand-icon img { width: 100%; height: 100%; object-fit: contain; padding: 4px; display: none; }
+
+  .brand-name {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    margin-bottom: 3px;
+  }
+
+  .brand-meta {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text3);
+    letter-spacing: 0.5px;
+  }
+
+  .arrow {
+    color: var(--text3);
+    font-size: 20px;
+    transition: all 0.2s;
+    opacity: 0.5;
+  }
+
+  .footer {
+    text-align: center;
+    margin-top: 40px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--text3);
+    letter-spacing: 1px;
+  }
+
+  /* Card 1 - blue */
+  .brand-card:nth-child(1) { --accent: #5b8fff; }
+  .brand-card:nth-child(1) .brand-icon { color: #5b8fff; }
+  /* Card 2 - teal */
+  .brand-card:nth-child(2) { --accent: #22d3a0; }
+  .brand-card:nth-child(2) .brand-icon { color: #22d3a0; }
+  /* Card 3 - amber */
+  .brand-card:nth-child(3) { --accent: #f5a623; }
+  .brand-card:nth-child(3) .brand-icon { color: #f5a623; }
+
+  @media (max-width: 480px) {
+    .logo { font-size: 32px; }
+    .brand-card { padding: 18px 20px; }
+    .brand-name { font-size: 16px; }
+    .brand-icon { width: 40px; height: 40px; font-size: 16px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <div class="logo">Sky<span>net</span></div>
+    <div class="tagline">Monitor de IA &nbsp;&#183;&nbsp; Selecione uma marca</div>
+  </div>
+
+  <div class="cards">
+    <a class="brand-card" href="marca-1.html" id="card-1">
+      <div class="brand-info">
+        <div class="brand-icon" id="icon-1">
+          <img id="logo-img-1" alt="">
+          <span id="logo-letter-1">1</span>
+        </div>
+        <div>
+          <div class="brand-name" id="name-1">Marca 1</div>
+          <div class="brand-meta" id="meta-1">Clique para abrir o dashboard</div>
+        </div>
+      </div>
+      <div class="arrow">&#8594;</div>
+    </a>
+
+    <a class="brand-card" href="marca-2.html" id="card-2">
+      <div class="brand-info">
+        <div class="brand-icon" id="icon-2">
+          <img id="logo-img-2" alt="">
+          <span id="logo-letter-2">2</span>
+        </div>
+        <div>
+          <div class="brand-name" id="name-2">Marca 2</div>
+          <div class="brand-meta" id="meta-2">Clique para abrir o dashboard</div>
+        </div>
+      </div>
+      <div class="arrow">&#8594;</div>
+    </a>
+
+    <a class="brand-card" href="marca-3.html" id="card-3">
+      <div class="brand-info">
+        <div class="brand-icon" id="icon-3">
+          <img id="logo-img-3" alt="">
+          <span id="logo-letter-3">3</span>
+        </div>
+        <div>
+          <div class="brand-name" id="name-3">Marca 3</div>
+          <div class="brand-meta" id="meta-3">Clique para abrir o dashboard</div>
+        </div>
+      </div>
+      <div class="arrow">&#8594;</div>
+    </a>
+  </div>
+
+  <div class="footer">Skynet &nbsp;&#183;&nbsp; Powered by Claude AI</div>
+</div>
+
+<script>
+// Pull brand names and logos from each dashboard's localStorage
+const brands = [
+  { key: 'bp', nameEl: 'name-1', metaEl: 'meta-1', imgEl: 'logo-img-1', letterEl: 'logo-letter-1' },
+  { key: 'b2', nameEl: 'name-2', metaEl: 'meta-2', imgEl: 'logo-img-2', letterEl: 'logo-letter-2' },
+  { key: 'b3', nameEl: 'name-3', metaEl: 'meta-3', imgEl: 'logo-img-3', letterEl: 'logo-letter-3' },
+];
+
+brands.forEach(b => {
+  const brand = localStorage.getItem(b.key + '_brand');
+  const logo  = localStorage.getItem(b.key + '_logo');
+  const history = JSON.parse(localStorage.getItem(b.key + '_history') || '[]');
+
+  if (brand) {
+    document.getElementById(b.nameEl).textContent = brand;
+    document.getElementById(b.letterEl).textContent = brand.charAt(0).toUpperCase();
+  }
+
+  if (logo) {
+    const img = document.getElementById(b.imgEl);
+    img.src = logo;
+    img.style.display = 'block';
+    document.getElementById(b.letterEl).style.display = 'none';
+  }
+
+  if (history.length) {
+    const last = history[history.length - 1];
+    const date = new Date(last.date).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+    const score = last.overall_score;
+    const scoreColor = score >= 70 ? '#22d3a0' : score >= 45 ? '#f5a623' : '#ff5b6b';
+    document.getElementById(b.metaEl).innerHTML =
+      `&#218;ltima an&#225;lise: ${date} &nbsp;&#183;&nbsp; Score: <span style="color:${scoreColor};font-weight:700">${score}/100</span>`;
+  }
+});
+</script>
+</body>
+</html>

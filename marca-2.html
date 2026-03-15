@@ -1,0 +1,2382 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skynet — Marca 2</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0c10;
+    --bg2: #111318;
+    --bg3: #181c24;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.12);
+    --text: #e8eaf0;
+    --text2: #8b8fa8;
+    --text3: #555870;
+    --accent: #22d3a0;
+    --accent2: #0f9e74;
+    --green: #22d3a0;
+    --red: #ff5b6b;
+    --amber: #f5a623;
+    --purple: #a78bfa;
+    --glow: rgba(91,143,255,0.15);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Syne', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* subtle grid bg */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .app { position: relative; z-index: 1; display: flex; min-height: 100vh; }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    width: 220px;
+    flex-shrink: 0;
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 24px 0;
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+  }
+
+  .logo {
+    padding: 0 20px 28px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 20px;
+  }
+
+  .logo-mark {
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: var(--text);
+  }
+
+  .logo-mark span { color: var(--accent); }
+
+  .logo-sub {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--text3);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  .nav-section {
+    padding: 0 12px;
+    margin-bottom: 8px;
+  }
+
+  .nav-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text3);
+    padding: 0 8px;
+    margin-bottom: 6px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text2);
+    border: 1px solid transparent;
+  }
+
+  .nav-item:hover { background: var(--bg3); color: var(--text); }
+
+  .nav-item.active {
+    background: rgba(91,143,255,0.12);
+    color: var(--accent);
+    border-color: rgba(91,143,255,0.2);
+  }
+
+  .nav-icon {
+    width: 16px;
+    height: 16px;
+    opacity: 0.8;
+  }
+
+  .sidebar-bottom {
+    margin-top: auto;
+    padding: 16px 12px 0;
+    border-top: 1px solid var(--border);
+  }
+
+  .api-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px;
+    background: var(--bg3);
+    border-radius: 8px;
+    font-size: 11px;
+    color: var(--text2);
+    font-family: 'DM Mono', monospace;
+  }
+
+  .status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--green);
+    animation: pulse 2s infinite;
+    flex-shrink: 0;
+  }
+
+  @keyframes pulse {
+    0%,100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  /* ── Main ── */
+  .main {
+    margin-left: 220px;
+    flex: 1;
+    padding: 32px;
+    max-width: calc(100vw - 220px);
+  }
+
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* ── Header ── */
+  .page-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 32px;
+  }
+
+  .page-title {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    line-height: 1.1;
+  }
+
+  .page-subtitle {
+    font-size: 13px;
+    color: var(--text2);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: 'Syne', sans-serif;
+    cursor: pointer;
+    transition: all 0.15s;
+    border: none;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+  }
+
+  .btn-primary:hover { background: var(--accent2); transform: translateY(-1px); }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  .btn-ghost {
+    background: var(--bg3);
+    color: var(--text2);
+    border: 1px solid var(--border2);
+  }
+
+  .btn-ghost:hover { color: var(--text); border-color: var(--border2); }
+
+  /* ── Stat cards ── */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .stat-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    border-radius: 12px 12px 0 0;
+  }
+
+  .stat-card.blue::before { background: var(--accent); }
+  .stat-card.green::before { background: var(--green); }
+  .stat-card.red::before { background: var(--red); }
+  .stat-card.amber::before { background: var(--amber); }
+
+  .stat-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 10px;
+  }
+
+  .stat-value {
+    font-size: 36px;
+    font-weight: 800;
+    letter-spacing: -1px;
+    line-height: 1;
+  }
+
+  .stat-value.green { color: var(--green); }
+  .stat-value.red { color: var(--red); }
+  .stat-value.amber { color: var(--amber); }
+
+  .stat-delta {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    margin-top: 6px;
+    color: var(--text2);
+  }
+
+  .delta-up { color: var(--green); }
+  .delta-down { color: var(--red); }
+
+  /* ── Grid layout ── */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .grid-3-1 {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  /* ── Cards ── */
+  .card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+
+  .card-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: 0.2px;
+  }
+
+  .card-badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+  }
+
+  .badge-green { background: rgba(34,211,160,0.12); color: var(--green); }
+  .badge-red { background: rgba(255,91,107,0.12); color: var(--red); }
+  .badge-blue { background: rgba(91,143,255,0.12); color: var(--accent); }
+  .badge-amber { background: rgba(245,166,35,0.12); color: var(--amber); }
+
+  /* ── Sentiment bar chart ── */
+  .sentiment-bars { display: flex; flex-direction: column; gap: 10px; }
+
+  .s-row { display: flex; align-items: center; gap: 10px; }
+
+  .s-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text2);
+    width: 64px;
+    flex-shrink: 0;
+  }
+
+  .s-track {
+    flex: 1;
+    height: 6px;
+    background: var(--bg3);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .s-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .s-fill.green { background: var(--green); }
+  .s-fill.red { background: var(--red); }
+  .s-fill.amber { background: var(--amber); }
+
+  .s-pct {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text2);
+    width: 36px;
+    text-align: right;
+  }
+
+  /* ── SKU table ── */
+  .sku-table { width: 100%; border-collapse: collapse; }
+
+  .sku-table th {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text3);
+    padding: 0 0 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .sku-table td {
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+    vertical-align: middle;
+  }
+
+  .sku-table tr:last-child td { border-bottom: none; }
+
+  .sku-name { font-weight: 700; color: var(--text); }
+  .sku-code {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--text3);
+    margin-top: 2px;
+  }
+
+  .score-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  .score-high { background: rgba(34,211,160,0.12); color: var(--green); }
+  .score-mid { background: rgba(245,166,35,0.12); color: var(--amber); }
+  .score-low { background: rgba(255,91,107,0.12); color: var(--red); }
+
+  /* ── Timeline sparklines ── */
+  .sparkline-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+
+  .spark-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text2);
+    width: 100px;
+    flex-shrink: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  svg.sparkline {
+    flex: 1;
+    height: 28px;
+  }
+
+  .spark-val {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text2);
+    width: 32px;
+    text-align: right;
+  }
+
+  /* ── Analysis output ── */
+  .analysis-box {
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-radius: 10px;
+    padding: 16px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    line-height: 1.7;
+    color: var(--text2);
+    min-height: 80px;
+    white-space: pre-wrap;
+    position: relative;
+  }
+
+  .analysis-box .cursor {
+    display: inline-block;
+    width: 7px;
+    height: 13px;
+    background: var(--accent);
+    animation: blink 1s infinite;
+    vertical-align: text-bottom;
+    margin-left: 2px;
+  }
+
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+  /* ── Queries page ── */
+  .query-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .query-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text3);
+    padding-top: 2px;
+    flex-shrink: 0;
+    width: 24px;
+  }
+
+  .query-content { flex: 1; }
+
+  .query-text {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+
+  .query-meta {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--text3);
+  }
+
+  .query-result {
+    font-size: 12px;
+    color: var(--text2);
+    margin-top: 8px;
+    line-height: 1.6;
+    border-top: 1px solid var(--border);
+    padding-top: 8px;
+    display: none;
+  }
+
+  .query-result.visible { display: block; }
+
+  .run-btn {
+    background: rgba(91,143,255,0.1);
+    border: 1px solid rgba(91,143,255,0.25);
+    color: var(--accent);
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: 'Syne', sans-serif;
+    cursor: pointer;
+    transition: all 0.15s;
+    flex-shrink: 0;
+  }
+
+  .run-btn:hover { background: rgba(91,143,255,0.18); }
+  .run-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* ── Config page ── */
+  .config-section { margin-bottom: 28px; }
+
+  .config-title {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 14px;
+    color: var(--text);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 10px;
+  }
+
+  .form-group { margin-bottom: 14px; }
+
+  .form-label {
+    display: block;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 6px;
+  }
+
+  .form-input {
+    width: 100%;
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 13px;
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .form-input:focus { border-color: var(--accent); }
+  .form-input::placeholder { color: var(--text3); }
+
+  .sku-list { display: flex; flex-direction: column; gap: 8px; }
+
+  .sku-input-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .sku-input-row .form-input { margin-bottom: 0; }
+
+  .remove-btn {
+    background: rgba(255,91,107,0.1);
+    border: 1px solid rgba(255,91,107,0.2);
+    color: var(--red);
+    width: 32px;
+    height: 36px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.15s;
+  }
+
+  .remove-btn:hover { background: rgba(255,91,107,0.2); }
+
+  /* ── Report page ── */
+  .report-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 16px;
+  }
+
+  .report-meta {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--text3);
+    letter-spacing: 1px;
+    margin-bottom: 16px;
+  }
+
+  .report-section { margin-bottom: 20px; }
+
+  .report-section-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text3);
+    font-family: 'DM Mono', monospace;
+    margin-bottom: 8px;
+  }
+
+  .report-body {
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--text2);
+  }
+
+  .report-highlight {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+  }
+
+  .highlight-item {
+    flex: 1;
+    background: var(--bg3);
+    border-radius: 8px;
+    padding: 12px;
+    border-left: 3px solid var(--accent);
+  }
+
+  .highlight-item.good { border-left-color: var(--green); }
+  .highlight-item.bad { border-left-color: var(--red); }
+
+  .highlight-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .highlight-text {
+    font-size: 12px;
+    color: var(--text2);
+    line-height: 1.5;
+  }
+
+  /* ── Loading spinner ── */
+  .spinner {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255,255,255,0.2);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── Toast ── */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    border-radius: 10px;
+    padding: 12px 18px;
+    font-size: 13px;
+    color: var(--text);
+    z-index: 100;
+    transform: translateY(80px);
+    opacity: 0;
+    transition: all 0.3s;
+    max-width: 320px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  }
+
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast.success { border-color: rgba(34,211,160,0.3); }
+  .toast.error { border-color: rgba(255,91,107,0.3); }
+
+
+  /* ── Logo upload ── */
+  .brand-logo-area {
+    padding: 0 20px 20px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 16px;
+  }
+  .logo-upload-box {
+    width: 100%;
+    height: 100px;
+    border: 1.5px dashed var(--border2);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    overflow: hidden;
+    position: relative;
+    margin-top: 10px;
+    background: var(--bg3);
+  }
+  .logo-upload-box:hover { border-color: var(--accent); background: rgba(91,143,255,0.06); }
+  .logo-upload-box:hover .logo-upload-hint { color: var(--accent); }
+  .logo-upload-box img { max-width: 100%; max-height: 100%; object-fit: contain; padding: 8px; }
+  .logo-upload-hint { font-family: monospace; font-size: 10px; color: var(--text3); letter-spacing: 0.5px; transition: color 0.15s; }
+  .logo-upload-icon { width: 20px; height: 20px; opacity: 0.4; transition: opacity 0.15s; }
+  .logo-upload-box:hover .logo-upload-icon { opacity: 0.7; }
+  #logoFileInput { display: none; }
+
+  /* ── Responses page ── */
+  .filter-bar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .filter-input {
+    flex: 1;
+    min-width: 180px;
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 13px;
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    outline: none;
+  }
+  .filter-input:focus { border-color: var(--accent); }
+  .filter-select {
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 12px;
+    color: var(--text2);
+    font-family: 'DM Mono', monospace;
+    outline: none;
+    cursor: pointer;
+  }
+  .resp-table { width: 100%; border-collapse: collapse; }
+  .resp-table th {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text3);
+    padding: 0 12px 12px 0;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  .resp-table td {
+    padding: 12px 12px 12px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+    vertical-align: top;
+  }
+  .resp-table tr:last-child td { border-bottom: none; }
+  .resp-table tr:hover td { background: rgba(255,255,255,0.02); }
+  .resp-question { font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .resp-answer { color: var(--text2); line-height: 1.5; font-style: italic; }
+  .resp-claims { margin-top: 4px; display: flex; flex-wrap: wrap; gap: 4px; }
+  .claim-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 10px;
+    background: rgba(91,143,255,0.1);
+    color: var(--accent);
+  }
+
+  /* ── SKU Timeline ── */
+  .sku-timeline-tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+  .sku-tab {
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid var(--border2);
+    color: var(--text2);
+    background: transparent;
+    transition: all 0.15s;
+    font-family: 'Syne', sans-serif;
+  }
+  .sku-tab.active {
+    background: rgba(91,143,255,0.12);
+    color: var(--accent);
+    border-color: rgba(91,143,255,0.3);
+  }
+  .sku-timeline-entry {
+    display: flex;
+    gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+    align-items: flex-start;
+  }
+  .sku-timeline-entry:last-child { border-bottom: none; }
+  .timeline-date {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--text3);
+    width: 80px;
+    flex-shrink: 0;
+    padding-top: 2px;
+  }
+  .timeline-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 4px;
+  }
+  .timeline-body { flex: 1; }
+  .timeline-question { font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .timeline-answer { font-size: 12px; color: var(--text2); line-height: 1.5; font-style: italic; }
+  .timeline-meta { font-size: 11px; color: var(--text3); margin-top: 4px; font-family: 'DM Mono', monospace; }
+
+  /* ── Scrollbar ── */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+  /* ── Hamburger button ── */
+  .hamburger {
+    display: none;
+    position: fixed;
+    top: 14px;
+    left: 14px;
+    z-index: 200;
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    border-radius: 8px;
+    width: 40px;
+    height: 40px;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-direction: column;
+    gap: 5px;
+    padding: 10px;
+  }
+  .hamburger span {
+    display: block;
+    width: 18px;
+    height: 2px;
+    background: var(--text2);
+    border-radius: 2px;
+    transition: all 0.25s;
+  }
+  .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+  .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  /* ── Overlay ── */
+  .sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 149;
+    backdrop-filter: blur(2px);
+  }
+  .sidebar-overlay.visible { display: block; }
+
+  /* ── Responsive — Tablet portrait & mobile ── */
+  @media (max-width: 900px) {
+    .stats-row { grid-template-columns: repeat(2, 1fr); }
+    .grid-2, .grid-3-1 { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 768px) {
+    /* Show hamburger */
+    .hamburger { display: flex; }
+
+    /* Sidebar slides in from left */
+    .sidebar {
+      transform: translateX(-100%);
+      transition: transform 0.28s cubic-bezier(0.4,0,0.2,1);
+      z-index: 150;
+      width: 260px;
+    }
+    .sidebar.open { transform: translateX(0); }
+
+    /* Main fills full width */
+    .main {
+      margin-left: 0;
+      max-width: 100vw;
+      padding: 64px 16px 24px;
+    }
+
+    /* Stack all grids */
+    .stats-row { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .grid-2, .grid-3-1 { grid-template-columns: 1fr; gap: 12px; }
+
+    /* Page header stacks */
+    .page-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .page-header > div:last-child { width: 100%; }
+    .page-header .btn { width: 100%; justify-content: center; }
+    .page-header > div:last-child { display: flex; flex-direction: column; gap: 8px; }
+
+    /* Cards */
+    .card { padding: 14px; }
+    .stat-card { padding: 14px; }
+    .stat-value { font-size: 28px; }
+
+    /* Report highlights stack */
+    .report-highlight { flex-direction: column; }
+
+    /* Filter bar wraps */
+    .filter-bar { gap: 8px; }
+    .filter-input { min-width: 100%; }
+
+    /* Table horizontal scroll */
+    .resp-table th, .resp-table td { font-size: 11px; padding: 8px 8px 8px 0; }
+    .resp-question { font-size: 11px; }
+    .resp-answer { font-size: 11px; }
+
+    /* Config grid */
+    .config-section { margin-bottom: 20px; }
+
+    /* SKU tabs wrap nicely */
+    .sku-timeline-tabs { gap: 6px; }
+    .sku-tab { font-size: 11px; padding: 4px 10px; }
+
+    /* Page title smaller */
+    .page-title { font-size: 22px; }
+
+    /* Report cards */
+    .report-card { padding: 16px; }
+  }
+
+  @media (max-width: 480px) {
+    .stats-row { grid-template-columns: 1fr; }
+    .main { padding: 60px 12px 20px; }
+    .stat-value { font-size: 24px; }
+    .page-title { font-size: 20px; }
+    .card { padding: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menu">
+  <span></span><span></span><span></span>
+</button>
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+<div class="app">
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand-logo-area">
+      <div class="logo-mark">Sky<span>net</span></div>
+      <div class="logo-sub">Monitor de IA</div>
+      <div class="logo-upload-box" onclick="document.getElementById('logoFileInput').click()" id="logoBox" title="Clique para adicionar o logo da marca">
+        <svg class="logo-upload-icon" id="logoIcon" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="4" width="16" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/>
+          <circle cx="7.5" cy="9" r="1.5" stroke="currentColor" stroke-width="1.2"/>
+          <path d="M2 14l4-4 3 3 3-4 4 5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="logo-upload-hint" id="logoHint">+ Logo da marca</span>
+        <img id="logoImg" style="display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:10px" alt="Logo">
+      </div>
+      <input type="file" id="logoFileInput" accept="image/*" onchange="handleLogoUpload(event)">
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Visão Geral</div>
+      <div class="nav-item active" onclick="showPage('dashboard')">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none">
+          <rect x="1" y="1" width="6" height="6" rx="1.5" fill="currentColor" opacity="0.8"/>
+          <rect x="9" y="1" width="6" height="6" rx="1.5" fill="currentColor" opacity="0.4"/>
+          <rect x="1" y="9" width="6" height="6" rx="1.5" fill="currentColor" opacity="0.4"/>
+          <rect x="9" y="9" width="6" height="6" rx="1.5" fill="currentColor" opacity="0.8"/>
+        </svg>
+        Dashboard
+      </div>
+      <div class="nav-item" onclick="showPage('queries')">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none">
+          <circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M11 11l3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        Consultas
+      </div>
+      <div class="nav-item" onclick="showPage('responses')">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none">
+          <path d="M2 4h12M2 8h8M2 12h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        Respostas
+      </div>
+      <div class="nav-item" onclick="showPage('sku-timeline')">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none">
+          <circle cx="4" cy="4" r="1.5" fill="currentColor"/>
+          <circle cx="4" cy="8" r="1.5" fill="currentColor"/>
+          <circle cx="4" cy="12" r="1.5" fill="currentColor"/>
+          <path d="M7 4h7M7 8h5M7 12h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        Linha do tempo
+      </div>
+      <div class="nav-item" onclick="showPage('report')">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none">
+          <rect x="2" y="1" width="12" height="14" rx="2" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M5 5h6M5 8h6M5 11h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        Relatório
+      </div>
+    </div>
+
+    <div class="nav-section" style="margin-top:8px">
+      <div class="nav-label">Sistema</div>
+      <div class="nav-item" onclick="showPage('config')">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none">
+          <circle cx="8" cy="8" r="2.5" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.41 1.41M11.54 11.54l1.41 1.41M3.05 12.95l1.41-1.41M11.54 4.46l1.41-1.41" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        Configurações
+      </div>
+    </div>
+
+    <div class="sidebar-bottom">
+      <div class="nav-label" style="padding:0 8px;margin-bottom:8px">Chave de API</div>
+      <div style="position:relative;margin-bottom:10px">
+        <input
+          id="apiKeyInput"
+          type="password"
+          class="form-input"
+          placeholder="sk-ant-..."
+          style="font-family:monospace;font-size:11px;padding:8px 36px 8px 10px"
+          oninput="saveApiKey(this.value)"
+        >
+        <button onclick="toggleKeyVisibility()" title="Mostrar/ocultar"
+          style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text3);font-size:14px;padding:0;line-height:1" id="eyeBtn">&#128065;</button>
+      </div>
+      <a href="https://console.anthropic.com/settings/keys" target="_blank"
+        style="font-family:monospace;font-size:10px;color:var(--accent);text-decoration:none;display:block;margin-bottom:12px;padding:0 2px;opacity:0.7">
+        Obter chave gratis &rarr; console.anthropic.com
+      </a>
+      <div class="api-status">
+        <div class="status-dot" id="statusDot" style="background:var(--red)"></div>
+        <span id="statusText">Sem chave de API</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main content -->
+  <main class="main">
+
+    <!-- ── DASHBOARD PAGE ── -->
+    <div class="page active" id="page-dashboard">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Dashboard</div>
+          <div class="page-subtitle" id="dash-subtitle">Monitorando sua marca no ChatGPT</div>
+        </div>
+        <button class="btn btn-primary" id="runAnalysisBtn" onclick="runFullAnalysis()">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <polygon points="3,2 12,7 3,12" fill="currentColor"/>
+          </svg>
+          Analisar agora
+        </button>
+      </div>
+
+      <!-- Stats row -->
+      <div class="stats-row">
+        <div class="stat-card blue">
+          <div class="stat-label">Score geral</div>
+          <div class="stat-value" id="stat-score">—</div>
+          <div class="stat-delta" id="stat-score-delta">aguardando análise</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-label">Menções positivas</div>
+          <div class="stat-value green" id="stat-pos">—</div>
+          <div class="stat-delta" id="stat-pos-delta">desta semana</div>
+        </div>
+        <div class="stat-card red">
+          <div class="stat-label">Menções negativas</div>
+          <div class="stat-value red" id="stat-neg">—</div>
+          <div class="stat-delta" id="stat-neg-delta">desta semana</div>
+        </div>
+        <div class="stat-card amber">
+          <div class="stat-label">Consultas rodadas</div>
+          <div class="stat-value" id="stat-queries">0</div>
+          <div class="stat-delta">total acumulado</div>
+        </div>
+      </div>
+
+      <!-- Middle row -->
+      <div class="grid-3-1">
+        <!-- Sentiment by SKU -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Sentimento por SKU</span>
+            <span class="card-badge badge-blue" id="last-run-badge">—</span>
+          </div>
+          <div id="sku-sentiment-list">
+            <div style="color:var(--text3);font-size:12px;font-family:monospace;padding:20px 0;text-align:center">
+              Rode uma análise para ver os dados
+            </div>
+          </div>
+        </div>
+
+        <!-- Sentiment distribution -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Distribuição</span>
+          </div>
+          <div style="margin-bottom:20px">
+            <div id="donut-container" style="display:flex;align-items:center;justify-content:center;height:120px">
+              <svg width="120" height="120" viewBox="0 0 120 120">
+                <circle cx="60" cy="60" r="45" fill="none" stroke="var(--bg3)" stroke-width="14"/>
+                <circle id="donut-pos" cx="60" cy="60" r="45" fill="none" stroke="var(--green)" stroke-width="14"
+                  stroke-dasharray="0 283" stroke-dashoffset="70.75" transform="rotate(-90 60 60)"
+                  style="transition:stroke-dasharray 0.8s cubic-bezier(0.4,0,0.2,1)"/>
+                <circle id="donut-neg" cx="60" cy="60" r="45" fill="none" stroke="var(--red)" stroke-width="14"
+                  stroke-dasharray="0 283" stroke-dashoffset="70.75" transform="rotate(-90 60 60)"
+                  style="transition:all 0.8s cubic-bezier(0.4,0,0.2,1)"/>
+                <text x="60" y="56" text-anchor="middle" fill="var(--text)" font-size="20" font-weight="800" font-family="Syne,sans-serif" id="donut-center">—</text>
+                <text x="60" y="70" text-anchor="middle" fill="var(--text3)" font-size="9" font-family="DM Mono,monospace">SCORE</text>
+              </svg>
+            </div>
+          </div>
+          <div class="sentiment-bars" id="sentiment-bars">
+            <div class="s-row">
+              <div class="s-label">Positivo</div>
+              <div class="s-track"><div class="s-fill green" id="bar-pos" style="width:0%"></div></div>
+              <div class="s-pct" id="pct-pos">0%</div>
+            </div>
+            <div class="s-row">
+              <div class="s-label">Neutro</div>
+              <div class="s-track"><div class="s-fill amber" id="bar-neu" style="width:0%"></div></div>
+              <div class="s-pct" id="pct-neu">0%</div>
+            </div>
+            <div class="s-row">
+              <div class="s-label">Negativo</div>
+              <div class="s-track"><div class="s-fill red" id="bar-neg" style="width:0%"></div></div>
+              <div class="s-pct" id="pct-neg">0%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom row -->
+      <div class="grid-2">
+        <!-- Analysis output -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Última análise — IA</span>
+            <span class="card-badge badge-blue">Claude</span>
+          </div>
+          <div class="analysis-box" id="analysis-output">Rode uma análise para ver o resumo da IA aqui...</div>
+        </div>
+
+        <!-- SKU table -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Top SKUs monitorados</span>
+          </div>
+          <table class="sku-table" id="sku-table">
+            <thead>
+              <tr>
+                <th>Produto</th>
+                <th>Menções</th>
+                <th>Score</th>
+                <th>Variação</th>
+              </tr>
+            </thead>
+            <tbody id="sku-table-body">
+              <tr><td colspan="4" style="color:var(--text3);font-size:12px;font-family:monospace;text-align:center;padding:20px 0">Sem dados ainda</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── QUERIES PAGE ── -->
+    <div class="page" id="page-queries">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Consultas</div>
+          <div class="page-subtitle">Perguntas enviadas ao ChatGPT sobre sua marca</div>
+        </div>
+        <button class="btn btn-primary" onclick="runAllQueries()">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><polygon points="3,2 12,7 3,12" fill="currentColor"/></svg>
+          Rodar todas
+        </button>
+      </div>
+      <div id="queries-list"></div>
+    </div>
+
+    <!-- ── REPORT PAGE ── -->
+    <div class="page" id="page-report">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Relatório semanal</div>
+          <div class="page-subtitle">Gerado automaticamente pela IA</div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-ghost" id="exportSheetsBtn" onclick="exportToSheets()" title="Exportar dados para o Google Sheets">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <rect x="1" y="1" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M4 5h6M4 7h6M4 9h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+            </svg>
+            Exportar para Sheets
+          </button>
+          <button class="btn btn-primary" id="genReportBtn" onclick="generateReport()">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M7 1v8M4 6l3 3 3-3M2 11h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Gerar relatório
+          </button>
+        </div>
+      </div>
+      <div id="report-content">
+        <div class="report-card" style="text-align:center;padding:40px;color:var(--text3);font-size:13px;font-family:monospace">
+          Clique em "Gerar relatório" para criar o relatório semanal com IA
+        </div>
+      </div>
+    </div>
+
+    <!-- ── RESPONSES PAGE ── -->
+    <div class="page" id="page-responses">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Respostas das consultas</div>
+          <div class="page-subtitle">Todas as respostas registradas por pergunta e produto</div>
+        </div>
+        <button class="btn btn-primary" onclick="exportResponsesToSheets()">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M4 5h6M4 7h6M4 9h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+          Exportar para Sheets
+        </button>
+      </div>
+      <div class="filter-bar">
+        <input class="filter-input" type="text" id="resp-search" placeholder="Buscar por pergunta, resposta ou produto..." oninput="renderResponses()">
+        <select class="filter-select" id="resp-filter-sentiment" onchange="renderResponses()">
+          <option value="">Todos os sentimentos</option>
+          <option value="positivo">Positivo</option>
+          <option value="neutro">Neutro</option>
+          <option value="negativo">Negativo</option>
+        </select>
+        <select class="filter-select" id="resp-filter-type" onchange="renderResponses()">
+          <option value="">Marca + SKUs</option>
+          <option value="brand">Só marca</option>
+          <option value="sku">Só SKUs</option>
+        </select>
+        <span id="resp-count" style="font-family:monospace;font-size:11px;color:var(--text3);white-space:nowrap"></span>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="overflow-x:auto;padding:0 20px">
+          <table class="resp-table">
+            <thead>
+              <tr>
+                <th style="width:30px">#</th>
+                <th style="width:80px">Data</th>
+                <th style="width:100px">Alvo</th>
+                <th style="width:80px">Sentimento</th>
+                <th style="width:60px">Score</th>
+                <th>Pergunta / Resposta</th>
+              </tr>
+            </thead>
+            <tbody id="resp-table-body">
+              <tr><td colspan="6" style="text-align:center;padding:32px;color:var(--text3);font-size:12px;font-family:monospace">Rode consultas para ver as respostas aqui</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SKU TIMELINE PAGE ── -->
+    <div class="page" id="page-sku-timeline">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Linha do tempo por SKU</div>
+          <div class="page-subtitle">Histórico de percepção produto a produto</div>
+        </div>
+      </div>
+      <div class="sku-timeline-tabs" id="sku-timeline-tabs"></div>
+      <div class="card" id="sku-timeline-content">
+        <div style="text-align:center;padding:32px;color:var(--text3);font-size:12px;font-family:monospace">Rode consultas para ver o histórico por SKU</div>
+      </div>
+    </div>
+
+    <!-- ── CONFIG PAGE ── -->
+    <div class="page" id="page-config">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Configurações</div>
+          <div class="page-subtitle">Configure sua marca e produtos monitorados</div>
+        </div>
+        <button class="btn btn-primary" onclick="saveConfig()">Salvar configurações</button>
+      </div>
+
+      <div class="grid-2">
+        <div>
+          <div class="config-section">
+            <div class="config-title">Identidade da marca</div>
+            <div class="form-group">
+              <label class="form-label">Nome da marca</label>
+              <input class="form-input" type="text" id="conf-brand" placeholder="Ex: Natura, Havaianas, Grendene...">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Categoria / segmento</label>
+              <input class="form-input" type="text" id="conf-category" placeholder="Ex: cosméticos, calçados, alimentos...">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Principais concorrentes</label>
+              <input class="form-input" type="text" id="conf-competitors" placeholder="Ex: O Boticário, Avon, L'Oréal">
+            </div>
+          </div>
+
+          <div class="config-section">
+            <div class="config-title">Top 5 SKUs</div>
+            <div class="sku-list" id="sku-list"></div>
+            <button class="btn btn-ghost" style="margin-top:10px;font-size:12px" onclick="addSku()">+ Adicionar SKU</button>
+          </div>
+        </div>
+
+        <div>
+          <div class="config-section">
+            <div class="config-title">Perguntas de monitoramento</div>
+            <div class="form-group">
+              <label class="form-label">Perguntas personalizadas</label>
+              <textarea class="form-input" id="conf-queries" rows="8" placeholder="Uma pergunta por linha. Use {brand} para a marca e {sku} para o produto.&#10;&#10;Ex:&#10;Você recomendaria {brand} para cuidados pessoais?&#10;Quais são os melhores produtos de {category} do mercado?"></textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Frequência de análise</label>
+              <select class="form-input" id="conf-freq">
+                <option value="daily">Diária</option>
+                <option value="weekly" selected>Semanal</option>
+                <option value="manual">Apenas manual</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email para relatório</label>
+              <input class="form-input" type="email" id="conf-email" placeholder="seu@email.com">
+            </div>
+          </div>
+
+          <div class="config-section">
+            <div class="config-title">Google Sheets — histórico automático</div>
+            <div class="form-group">
+              <label class="form-label">URL do Web App (Apps Script)</label>
+              <input class="form-input" type="text" id="conf-sheets-url" placeholder="https://script.google.com/macros/s/...">
+            </div>
+            <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:12px;font-size:12px;color:var(--text2);line-height:1.6">
+              Cole aqui a URL do Web App gerado pelo Google Apps Script.<br>
+              Baixe o arquivo <strong style="color:var(--text)">apps-script.gs</strong> e siga as instruções do <strong style="color:var(--text)">INSTRUCOES.md</strong>.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── State ──
+const state = {
+  brand: 'Sua Marca',
+  category: 'produto',
+  competitors: 'concorrentes',
+  skus: ['SKU 1', 'SKU 2', 'SKU 3', 'SKU 4', 'SKU 5'],
+  queries: [],
+  results: {},
+  analysisCount: 0
+};
+
+// ── Sidebar toggle (mobile) ──
+function toggleSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebarOverlay');
+  const btn = document.getElementById('hamburger');
+  const isOpen = sidebar.classList.contains('open');
+  if (isOpen) {
+    closeSidebar();
+  } else {
+    sidebar.classList.add('open');
+    overlay.classList.add('visible');
+    btn.classList.add('open');
+  }
+}
+
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('visible');
+  document.getElementById('hamburger').classList.remove('open');
+}
+
+// ── Navigation ──
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  if (event && event.currentTarget) event.currentTarget.classList.add('active');
+  if (id === 'queries') renderQueriesList();
+  if (id === 'config') renderConfigPage();
+  if (id === 'responses') renderResponses();
+  if (id === 'sku-timeline') renderSkuTimeline();
+  // Auto-close sidebar on mobile after navigation
+  if (window.innerWidth <= 768) closeSidebar();
+}
+
+// ── Toast ──
+function toast(msg, type = '') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast ' + type + ' show';
+  setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+// ── Config ──
+function renderConfigPage() {
+  const brand = localStorage.getItem('b2_brand') || '';
+  const cat = localStorage.getItem('b2_category') || '';
+  const comp = localStorage.getItem('b2_competitors') || '';
+  const skus = JSON.parse(localStorage.getItem('b2_skus') || '["","","","",""]');
+  const queries = localStorage.getItem('b2_queries') || defaultQueries();
+  const email = localStorage.getItem('b2_email') || '';
+  const freq = localStorage.getItem('b2_freq') || 'weekly';
+
+  document.getElementById('conf-brand').value = brand;
+  document.getElementById('conf-category').value = cat;
+  document.getElementById('conf-competitors').value = comp;
+  document.getElementById('conf-queries').value = queries;
+  document.getElementById('conf-email').value = email;
+  document.getElementById('conf-freq').value = freq;
+  document.getElementById('conf-sheets-url').value = localStorage.getItem('b2_sheets_url') || '';
+
+  renderSkuInputs(skus);
+}
+
+function defaultQueries() {
+  return `Você recomendaria {brand} para {category}?
+Quais são as melhores marcas de {category} no Brasil?
+O que você sabe sobre {brand}?
+{brand} é confiável? Quais são os pontos positivos e negativos?
+Compare {brand} com {competitors} em {category}
+Quais produtos de {brand} você recomendaria para iniciantes?`;
+}
+
+function renderSkuInputs(skus) {
+  const list = document.getElementById('sku-list');
+  list.innerHTML = '';
+  skus.forEach((sku, i) => {
+    const row = document.createElement('div');
+    row.className = 'sku-input-row';
+    row.innerHTML = `
+      <input class="form-input" type="text" placeholder="Nome do SKU ${i+1}" value="${sku}" id="sku-input-${i}">
+      <button class="remove-btn" onclick="removeSku(${i})">×</button>`;
+    list.appendChild(row);
+  });
+}
+
+function addSku() {
+  const inputs = document.querySelectorAll('[id^="sku-input-"]');
+  if (inputs.length >= 8) { toast('Máximo de 8 SKUs', 'error'); return; }
+  const skus = [...inputs].map(i => i.value);
+  skus.push('');
+  renderSkuInputs(skus);
+}
+
+function removeSku(i) {
+  const inputs = document.querySelectorAll('[id^="sku-input-"]');
+  const skus = [...inputs].map(inp => inp.value);
+  skus.splice(i, 1);
+  renderSkuInputs(skus);
+}
+
+function saveConfig() {
+  const brand = document.getElementById('conf-brand').value.trim();
+  if (!brand) { toast('Informe o nome da marca', 'error'); return; }
+  const skus = [...document.querySelectorAll('[id^="sku-input-"]')]
+    .map(i => i.value.trim()).filter(Boolean);
+
+  localStorage.setItem('b2_brand', brand);
+  localStorage.setItem('b2_category', document.getElementById('conf-category').value.trim());
+  localStorage.setItem('b2_competitors', document.getElementById('conf-competitors').value.trim());
+  localStorage.setItem('b2_skus', JSON.stringify(skus));
+  localStorage.setItem('b2_queries', document.getElementById('conf-queries').value.trim());
+  localStorage.setItem('b2_email', document.getElementById('conf-email').value.trim());
+  localStorage.setItem('b2_freq', document.getElementById('conf-freq').value);
+  localStorage.setItem('b2_sheets_url', document.getElementById('conf-sheets-url').value.trim());
+
+  loadConfig();
+  toast('Configurações salvas!', 'success');
+}
+
+function loadConfig() {
+  state.brand = localStorage.getItem('b2_brand') || 'Sua Marca';
+  state.category = localStorage.getItem('b2_category') || 'produto';
+  state.competitors = localStorage.getItem('b2_competitors') || 'concorrentes';
+  state.skus = JSON.parse(localStorage.getItem('b2_skus') || '[]');
+  if (!state.skus.length) state.skus = ['SKU 1','SKU 2','SKU 3'];
+  document.getElementById('dash-subtitle').textContent = `Monitorando ${state.brand} no ChatGPT`;
+}
+
+// ── Build queries ──
+function buildQueries() {
+  const raw = (localStorage.getItem('b2_queries') || defaultQueries()).split('\n').filter(q => q.trim());
+  const queries = [];
+
+  // Brand queries
+  raw.forEach(q => {
+    const text = q
+      .replace(/\{brand\}/gi, state.brand)
+      .replace(/\{category\}/gi, state.category)
+      .replace(/\{competitors\}/gi, state.competitors);
+    queries.push({ text, type: 'brand', target: state.brand });
+  });
+
+  // SKU queries
+  state.skus.slice(0, 5).forEach(sku => {
+    queries.push({
+      text: `O que você sabe sobre ${sku} da ${state.brand}? É um bom produto?`,
+      type: 'sku', target: sku
+    });
+    queries.push({
+      text: `${sku} vale a pena comprar? Quais são os pontos positivos e negativos?`,
+      type: 'sku', target: sku
+    });
+  });
+
+  return queries;
+}
+
+function renderQueriesList() {
+  const queries = buildQueries();
+  const container = document.getElementById('queries-list');
+  container.innerHTML = '';
+  queries.forEach((q, i) => {
+    const div = document.createElement('div');
+    div.className = 'query-card';
+    div.innerHTML = `
+      <div class="query-num">${String(i+1).padStart(2,'0')}</div>
+      <div class="query-content">
+        <div class="query-text">${q.text}</div>
+        <div class="query-meta">Tipo: ${q.type === 'brand' ? 'Marca' : 'SKU'} · Alvo: ${q.target}</div>
+        <div class="query-result" id="qr-${i}"></div>
+      </div>
+      <button class="run-btn" id="run-btn-${i}" onclick="runSingleQuery(${i})">Rodar</button>`;
+    container.appendChild(div);
+  });
+  state.queries = queries;
+}
+
+// ── API call to Claude (Anthropic API) ──
+async function callClaude(systemPrompt, userMessage, maxTokens = 2000) {
+  const apiKey = localStorage.getItem('b2_apikey') || '';
+  if (!apiKey) throw new Error('Chave de API nao configurada. Cole sua chave sk-ant-... na barra lateral esquerda.');
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: maxTokens,
+      system: systemPrompt,
+      messages: [{ role: 'user', content: userMessage }]
+    })
+  });
+  const data = await res.json();
+  if (data.error) throw new Error(data.error.message);
+  return data.content[0].text;
+}
+
+// ── Safe JSON parser ──
+function safeParseJSON(text) {
+  // Strip markdown code fences
+  let clean = text.replace(/```json\s*/gi, '').replace(/```\s*/gi, '').trim();
+
+  // Try direct parse first
+  try { return JSON.parse(clean); } catch(_) {}
+
+  // Find the first { and last } to extract the JSON object
+  const start = clean.indexOf('{');
+  const end = clean.lastIndexOf('}');
+  if (start !== -1 && end !== -1 && end > start) {
+    try { return JSON.parse(clean.slice(start, end + 1)); } catch(_) {}
+  }
+
+  // Last resort: try to fix truncated JSON by closing open structures
+  try {
+    let fixed = clean.slice(start !== -1 ? start : 0);
+    const openBraces = (fixed.match(/\{/g) || []).length - (fixed.match(/\}/g) || []).length;
+    const openBrackets = (fixed.match(/\[/g) || []).length - (fixed.match(/\]/g) || []).length;
+    // Remove trailing incomplete key/value
+    fixed = fixed.replace(/,\s*"[^"]*"\s*:\s*[^,}\]]*$/, '');
+    fixed = fixed.replace(/,\s*$/, '');
+    for (let i = 0; i < openBrackets; i++) fixed += ']';
+    for (let i = 0; i < openBraces; i++) fixed += '}';
+    return JSON.parse(fixed);
+  } catch(e) {
+    throw new Error('Resposta da IA inválida. Tente novamente. (Detalhe: ' + e.message + ')');
+  }
+}
+
+// ── Simulate GPT response (we analyze what GPT *would* say) ──
+async function analyzeQuery(query) {
+  const system = `Você é um analisador de percepção de marca especializado em entender como assistentes de IA como o ChatGPT se referem a marcas e produtos.
+
+Sua tarefa: simular e analisar como o ChatGPT responderia à pergunta fornecida sobre a marca/produto, e então classificar o sentimento.
+
+Responda APENAS em JSON válido, sem markdown, sem explicações. Formato obrigatório:
+{
+  "gpt_response": "simulação curta da resposta do ChatGPT (2-3 frases)",
+  "sentiment": "positivo" | "neutro" | "negativo",
+  "score": número de 0 a 100,
+  "mentions_brand": true | false,
+  "key_claims": ["claim 1", "claim 2"],
+  "risks": ["risco 1"] | [],
+  "summary": "uma frase resumindo a percepção"
+}`;
+
+  const text = await callClaude(system, `Marca: ${state.brand}\nPergunta: ${query.text}`, 600);
+  return safeParseJSON(text);
+}
+
+// ── Run single query ──
+async function runSingleQuery(i) {
+  const btn = document.getElementById(`run-btn-${i}`);
+  const result = document.getElementById(`qr-${i}`);
+  const queries = state.queries;
+  if (!queries[i]) return;
+
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div>';
+  result.className = 'query-result visible';
+  result.textContent = 'Analisando...';
+
+  try {
+    const data = await analyzeQuery(queries[i]);
+    const sentColor = data.sentiment === 'positivo' ? 'var(--green)' : data.sentiment === 'negativo' ? 'var(--red)' : 'var(--amber)';
+    result.innerHTML = `
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+        <span style="color:${sentColor};font-weight:700;font-size:12px">${data.sentiment.toUpperCase()}</span>
+        <span style="font-family:monospace;font-size:11px;color:var(--text3)">score ${data.score}/100</span>
+      </div>
+      <div style="font-style:italic;color:var(--text2);margin-bottom:6px;font-size:12px">"${data.gpt_response}"</div>
+      <div style="font-size:11px;color:var(--text3)">${data.summary}</div>`;
+
+    state.results[i] = data;
+    state.analysisCount++;
+    document.getElementById('stat-queries').textContent = state.analysisCount;
+    saveQueryResponse(queries[i], data);
+    btn.textContent = 'Feito';
+  } catch(e) {
+    result.textContent = 'Erro: ' + e.message;
+    btn.textContent = 'Rodar';
+    btn.disabled = false;
+  }
+}
+
+// ── Run full analysis ──
+async function runFullAnalysis() {
+  const btn = document.getElementById('runAnalysisBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div> Analisando...';
+
+  const analysisEl = document.getElementById('analysis-output');
+  analysisEl.innerHTML = 'Consultando IA... <span class="cursor"></span>';
+
+  try {
+    const queries = buildQueries();
+    state.queries = queries;
+
+    const system = `Você é um especialista em brand intelligence e monitoramento de percepção de marca em assistentes de IA.
+
+Analise como o ChatGPT provavelmente se refere à marca e produtos informados, simulando múltiplas consultas.
+
+Responda APENAS em JSON válido. Formato:
+{
+  "overall_score": número 0-100,
+  "positive_pct": número 0-100,
+  "neutral_pct": número 0-100,
+  "negative_pct": número 0-100,
+  "positive_count": número,
+  "negative_count": número,
+  "skus": [
+    {"name": "nome do sku", "mentions": número, "score": número 0-100, "delta": "+X%" ou "-X%", "sentiment": "positivo/neutro/negativo"}
+  ],
+  "summary": "parágrafo de 3-4 frases sobre a percepção geral da marca no ChatGPT",
+  "highlights_good": [{"title": "título", "text": "descrição curta"}],
+  "highlights_bad": [{"title": "título", "text": "descrição curta"}],
+  "recommendations": ["recomendação 1", "recomendação 2", "recomendação 3"]
+}`;
+
+    const prompt = `Marca: ${state.brand}
+Categoria: ${state.category}
+Concorrentes: ${state.competitors}
+SKUs monitorados: ${state.skus.join(', ')}
+
+Analise a percepção desta marca no ChatGPT de forma realista e detalhada.`;
+
+    const text = await callClaude(system, prompt, 1500);
+    const data = safeParseJSON(text);
+
+    updateDashboard(data);
+    animateAnalysisText(analysisEl, data.summary);
+    document.getElementById('last-run-badge').textContent = 'Agora mesmo';
+    toast('Análise completa!', 'success');
+
+  } catch(e) {
+    analysisEl.textContent = 'Erro ao analisar: ' + e.message;
+    toast('Erro: ' + e.message, 'error');
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><polygon points="3,2 12,7 3,12" fill="currentColor"/></svg> Analisar agora`;
+}
+
+function updateDashboard(data) {
+  // Stats
+  document.getElementById('stat-score').textContent = data.overall_score;
+  document.getElementById('stat-score-delta').textContent = 'de 100 pontos';
+  document.getElementById('stat-pos').textContent = data.positive_count;
+  document.getElementById('stat-pos-delta').innerHTML = `<span class="delta-up">+${data.positive_pct}% positivo</span>`;
+  document.getElementById('stat-neg').textContent = data.negative_count;
+  document.getElementById('stat-neg-delta').innerHTML = `<span class="delta-down">${data.negative_pct}% negativo</span>`;
+
+  // Sentiment bars
+  setTimeout(() => {
+    document.getElementById('bar-pos').style.width = data.positive_pct + '%';
+    document.getElementById('bar-neu').style.width = data.neutral_pct + '%';
+    document.getElementById('bar-neg').style.width = data.negative_pct + '%';
+    document.getElementById('pct-pos').textContent = data.positive_pct + '%';
+    document.getElementById('pct-neu').textContent = data.neutral_pct + '%';
+    document.getElementById('pct-neg').textContent = data.negative_pct + '%';
+  }, 100);
+
+  // Donut
+  const total = 283;
+  const posArc = (data.positive_pct / 100) * total;
+  const negArc = (data.negative_pct / 100) * total;
+  const neuArc = total - posArc - negArc;
+
+  document.getElementById('donut-pos').setAttribute('stroke-dasharray', `${posArc} ${total - posArc}`);
+  document.getElementById('donut-pos').setAttribute('stroke-dashoffset', '70.75');
+
+  const negOffset = 70.75 - posArc - neuArc;
+  document.getElementById('donut-neg').setAttribute('stroke-dasharray', `${negArc} ${total - negArc}`);
+  document.getElementById('donut-neg').setAttribute('stroke-dashoffset', negOffset);
+
+  document.getElementById('donut-center').textContent = data.overall_score;
+
+  // SKU Sentiment list
+  const skuList = document.getElementById('sku-sentiment-list');
+  skuList.innerHTML = '';
+  (data.skus || []).forEach(sku => {
+    const color = sku.sentiment === 'positivo' ? 'var(--green)' : sku.sentiment === 'negativo' ? 'var(--red)' : 'var(--amber)';
+    const scoreClass = sku.score >= 70 ? 'score-high' : sku.score >= 45 ? 'score-mid' : 'score-low';
+    const row = document.createElement('div');
+    row.className = 'sparkline-row';
+    row.innerHTML = `
+      <div class="spark-label" title="${sku.name}">${sku.name}</div>
+      <svg class="sparkline" viewBox="0 0 100 28">
+        <polyline fill="none" stroke="${color}" stroke-width="1.5" stroke-linecap="round"
+          points="${generateSparkline(sku.score)}" opacity="0.8"/>
+      </svg>
+      <span class="score-pill ${scoreClass}">${sku.score}</span>`;
+    skuList.appendChild(row);
+  });
+
+  // Persist to history
+  saveAnalysisToHistory(data);
+
+  // SKU table
+  const tbody = document.getElementById('sku-table-body');
+  tbody.innerHTML = '';
+  (data.skus || []).forEach(sku => {
+    const scoreClass = sku.score >= 70 ? 'score-high' : sku.score >= 45 ? 'score-mid' : 'score-low';
+    const deltaColor = (sku.delta || '').startsWith('+') ? 'delta-up' : 'delta-down';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>
+        <div class="sku-name">${sku.name}</div>
+      </td>
+      <td style="font-family:monospace;font-size:12px;color:var(--text2)">${sku.mentions}</td>
+      <td><span class="score-pill ${scoreClass}">${sku.score}/100</span></td>
+      <td class="${deltaColor}" style="font-family:monospace;font-size:12px">${sku.delta || '&#8212;'}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+function generateSparkline(score) {
+  // Generate a sparkline path based on score with some randomness
+  const points = [];
+  for (let i = 0; i < 8; i++) {
+    const x = i * 14 + 2;
+    const base = 28 - (score / 100) * 22;
+    const y = Math.max(2, Math.min(26, base + (Math.random() - 0.5) * 8));
+    points.push(`${x},${y}`);
+  }
+  return points.join(' ');
+}
+
+function animateAnalysisText(el, text) {
+  el.innerHTML = '';
+  let i = 0;
+  const cursor = document.createElement('span');
+  cursor.className = 'cursor';
+  el.appendChild(cursor);
+  const interval = setInterval(() => {
+    if (i >= text.length) {
+      clearInterval(interval);
+      cursor.remove();
+      return;
+    }
+    el.insertBefore(document.createTextNode(text[i]), cursor);
+    i++;
+  }, 18);
+}
+
+// ── Run all queries ──
+async function runAllQueries() {
+  renderQueriesList();
+  const queries = state.queries;
+  for (let i = 0; i < queries.length; i++) {
+    await runSingleQuery(i);
+    await new Promise(r => setTimeout(r, 300));
+  }
+  toast('Todas as consultas finalizadas!', 'success');
+}
+
+// ── Generate report ──
+async function generateReport() {
+  const btn = document.getElementById('genReportBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div> Gerando...';
+
+  const container = document.getElementById('report-content');
+  container.innerHTML = '<div class="report-card" style="text-align:center;padding:40px;color:var(--text3);font-size:13px;font-family:monospace">Consultando IA...</div>';
+
+  try {
+    // Gather rich data for the report
+    const history = getHistory();
+    const responses = getResponses();
+    const lastAnalysis = history.length ? history[history.length - 1] : null;
+    const prevAnalysis = history.length > 1 ? history[history.length - 2] : null;
+
+    // Aggregate per-SKU response data
+    const skuData = {};
+    responses.forEach(r => {
+      if (!skuData[r.target]) skuData[r.target] = { positive: 0, neutral: 0, negative: 0, scores: [], claims: [] };
+      skuData[r.target][r.sentiment === 'positivo' ? 'positive' : r.sentiment === 'negativo' ? 'negative' : 'neutral']++;
+      skuData[r.target].scores.push(r.score);
+      (r.key_claims || []).forEach(c => skuData[r.target].claims.push(c));
+    });
+    const skuSummary = Object.entries(skuData).map(([name, d]) => {
+      const avg = d.scores.length ? Math.round(d.scores.reduce((a,b)=>a+b,0)/d.scores.length) : 0;
+      const topClaims = [...new Set(d.claims)].slice(0, 3);
+      return `${name}: score médio ${avg}/100, ${d.positive} positivas, ${d.neutral} neutras, ${d.negative} negativas. Claims: ${topClaims.join('; ') || 'nenhum'}`;
+    }).join('\n');
+
+    const scoreVar = lastAnalysis && prevAnalysis
+      ? (lastAnalysis.overall_score - prevAnalysis.overall_score)
+      : null;
+
+    const system = `Você é um analista sênior de brand intelligence especializado em monitoramento de marcas em assistentes de IA.
+
+Gere um relatório semanal executivo COMPLETO e DETALHADO em português. Use os dados fornecidos para análises específicas, não genéricas.
+
+Responda APENAS em JSON válido sem markdown:
+{
+  "week": "período da análise",
+  "executive_summary": "resumo executivo de 4-5 frases com os números principais",
+  "brand_perception": "análise detalhada de 4-5 frases sobre como o ChatGPT percebe a marca, com exemplos específicos",
+  "competitive_position": "como a marca se posiciona vs concorrentes nas respostas da IA (3-4 frases)",
+  "sku_analysis": [
+    {"name": "nome do sku", "score": número, "sentiment": "positivo/neutro/negativo", "highlights": "2-3 frases específicas sobre este SKU", "claims": ["claim 1", "claim 2"], "alert": "alerta se score < 50, senão vazio"}
+  ],
+  "sku_highlights": "visão geral comparativa dos SKUs (3-4 frases)",
+  "changes": "o que mudou vs semana anterior com números específicos (3-4 frases)",
+  "risks": ["risco específico 1", "risco específico 2", "risco específico 3"],
+  "opportunities": ["oportunidade concreta 1", "oportunidade concreta 2", "oportunidade concreta 3"],
+  "actions": ["ação recomendada específica 1", "ação recomendada específica 2", "ação recomendada específica 3", "ação recomendada específica 4"],
+  "next_steps": "próximos passos prioritários para a equipe (3-4 frases)"
+}`;
+
+    const prompt = `Marca: ${state.brand}
+Categoria: ${state.category}
+Concorrentes: ${state.competitors}
+SKUs monitorados: ${state.skus.join(', ')}
+Total de consultas realizadas: ${state.analysisCount}
+
+DADOS DA ÚLTIMA ANÁLISE:
+${lastAnalysis ? `Score geral: ${lastAnalysis.overall_score}/100
+Positivo: ${lastAnalysis.positive_pct}% | Neutro: ${lastAnalysis.neutral_pct}% | Negativo: ${lastAnalysis.negative_pct}%
+Menções positivas: ${lastAnalysis.positive_count} | Menções negativas: ${lastAnalysis.negative_count}
+${scoreVar !== null ? `Variação vs semana anterior: ${scoreVar > 0 ? '+' : ''}${scoreVar} pontos` : ''}` : 'Sem análise anterior'}
+
+DADOS POR SKU (respostas individuais):
+${skuSummary || 'Sem dados de SKU ainda &#8212; rode as consultas individuais'}
+
+Gere análises específicas e acionáveis baseadas nesses dados.`;
+
+    const text = await callClaude(system, prompt, 2000);
+    const data = safeParseJSON(text);
+    renderReport(data);
+    toast('Relatório gerado!', 'success');
+  } catch(e) {
+    container.innerHTML = `<div class="report-card"><p style="color:var(--red)">Erro: ${e.message}</p></div>`;
+    toast('Erro ao gerar relatório', 'error');
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1v8M4 6l3 3 3-3M2 11h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg> Gerar relatório`;
+}
+
+function renderReport(data) {
+  const container = document.getElementById('report-content');
+
+  const risksHtml = (data.risks||[]).map(r =>
+    `<div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:8px">
+      <span style="color:var(--red);font-size:14px;flex-shrink:0;margin-top:-1px">&#9656;</span>
+      <span style="font-size:13px;color:var(--text2);line-height:1.5">${r}</span>
+    </div>`).join('');
+
+  const oppsHtml = (data.opportunities||[]).map(o =>
+    `<div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:8px">
+      <span style="color:var(--green);font-size:14px;flex-shrink:0;margin-top:-1px">&#9656;</span>
+      <span style="font-size:13px;color:var(--text2);line-height:1.5">${o}</span>
+    </div>`).join('');
+
+  const actionsHtml = (data.actions||[]).map((a,i) =>
+    `<div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:10px;padding:12px;background:var(--bg3);border-radius:8px;border-left:3px solid var(--accent)">
+      <span style="font-family:monospace;font-size:11px;font-weight:700;color:var(--accent);flex-shrink:0;padding-top:1px">${i+1}</span>
+      <span style="font-size:13px;color:var(--text2);line-height:1.5">${a}</span>
+    </div>`).join('');
+
+  // SKU analysis cards
+  const skuCards = (data.sku_analysis||[]).map(sku => {
+    const scoreColor = sku.score >= 70 ? 'var(--green)' : sku.score >= 45 ? 'var(--amber)' : 'var(--red)';
+    const sentBadge = sku.sentiment === 'positivo'
+      ? 'badge-green' : sku.sentiment === 'negativo' ? 'badge-red' : 'badge-amber';
+    const claims = (sku.claims||[]).map(c => `<span class="claim-tag">${c}</span>`).join('');
+    const alertHtml = sku.alert
+      ? `<div style="margin-top:8px;padding:8px 10px;background:rgba(255,91,107,0.08);border:1px solid rgba(255,91,107,0.2);border-radius:6px;font-size:11px;color:var(--red)">${sku.alert}</div>`
+      : '';
+    return `<div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div style="font-size:14px;font-weight:700;color:var(--text)">${sku.name}</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="card-badge ${sentBadge}">${sku.sentiment}</span>
+          <span style="font-family:monospace;font-size:16px;font-weight:800;color:${scoreColor}">${sku.score}</span>
+        </div>
+      </div>
+      <div style="font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:8px">${sku.highlights}</div>
+      ${claims ? `<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px">${claims}</div>` : ''}
+      ${alertHtml}
+    </div>`;
+  }).join('');
+
+  container.innerHTML = `
+    <div class="report-card">
+      <div class="report-meta">RELATÓRIO SEMANAL · ${data.week || 'Semana atual'} · ${state.brand.toUpperCase()}</div>
+      <div class="report-section">
+        <div class="report-section-title">Resumo executivo</div>
+        <div class="report-body">${data.executive_summary}</div>
+      </div>
+      <div class="report-section">
+        <div class="report-section-title">Percepção da marca no ChatGPT</div>
+        <div class="report-body">${data.brand_perception}</div>
+      </div>
+      ${data.competitive_position ? `<div class="report-section">
+        <div class="report-section-title">Posicionamento competitivo</div>
+        <div class="report-body">${data.competitive_position}</div>
+      </div>` : ''}
+      <div class="report-section">
+        <div class="report-section-title">Mudanças identificadas</div>
+        <div class="report-body">${data.changes}</div>
+      </div>
+    </div>
+
+    ${skuCards ? `<div class="report-card">
+      <div class="report-section-title" style="margin-bottom:14px">Análise por SKU</div>
+      <div class="report-body" style="margin-bottom:12px">${data.sku_highlights || ''}</div>
+      ${skuCards}
+    </div>` : ''}
+
+    <div class="report-card">
+      <div class="report-highlight">
+        <div class="highlight-item bad">
+          <div class="highlight-title">Riscos identificados</div>
+          <div style="margin-top:8px">${risksHtml}</div>
+        </div>
+        <div class="highlight-item good">
+          <div class="highlight-title">Oportunidades</div>
+          <div style="margin-top:8px">${oppsHtml}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="report-card">
+      <div class="report-section-title" style="margin-bottom:14px">Ações recomendadas</div>
+      ${actionsHtml}
+    </div>
+
+    <div class="report-card">
+      <div class="report-section-title" style="margin-bottom:10px">Próximos passos</div>
+      <div class="report-body">${data.next_steps}</div>
+    </div>`;
+}
+
+// ── History (localStorage) ──
+function saveAnalysisToHistory(data) {
+  const history = JSON.parse(localStorage.getItem('b2_history') || '[]');
+  history.push({
+    date: new Date().toISOString(),
+    brand: state.brand,
+    overall_score: data.overall_score,
+    positive_pct: data.positive_pct,
+    neutral_pct: data.neutral_pct,
+    negative_pct: data.negative_pct,
+    positive_count: data.positive_count,
+    negative_count: data.negative_count,
+    skus: data.skus || [],
+    summary: data.summary || ''
+  });
+  // keep last 52 weeks
+  if (history.length > 52) history.splice(0, history.length - 52);
+  localStorage.setItem('b2_history', JSON.stringify(history));
+}
+
+function getHistory() {
+  return JSON.parse(localStorage.getItem('b2_history') || '[]');
+}
+
+// ── Export to Google Sheets via Apps Script Web App ──
+async function exportToSheets() {
+  const url = localStorage.getItem('b2_sheets_url') || '';
+  if (!url) {
+    toast('Configure a URL do Apps Script em Configurações primeiro', 'error');
+    return;
+  }
+  const history = getHistory();
+  if (!history.length) {
+    toast('Rode ao menos uma análise antes de exportar', 'error');
+    return;
+  }
+  const btn = document.getElementById('exportSheetsBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div> Enviando...';
+  try {
+    const payload = {
+      brand: state.brand,
+      exported_at: new Date().toISOString(),
+      history: history
+    };
+    await fetch(url, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    toast('Dados enviados para o Google Sheets!', 'success');
+  } catch(e) {
+    toast('Erro ao enviar: ' + e.message, 'error');
+  }
+  btn.disabled = false;
+  btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M4 5h6M4 7h6M4 9h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg> Exportar para Sheets`;
+}
+
+// ── Logo upload ──
+function handleLogoUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    const dataUrl = ev.target.result;
+    localStorage.setItem('b2_logo', dataUrl);
+    applyLogo(dataUrl);
+  };
+  reader.readAsDataURL(file);
+}
+
+function applyLogo(dataUrl) {
+  const img = document.getElementById('logoImg');
+  const hint = document.getElementById('logoHint');
+  const icon = document.getElementById('logoIcon');
+  if (dataUrl) {
+    img.src = dataUrl;
+    img.style.display = 'block';
+    hint.style.display = 'none';
+    if (icon) icon.style.display = 'none';
+  } else {
+    img.style.display = 'none';
+    hint.style.display = '';
+    if (icon) icon.style.display = '';
+  }
+}
+
+function loadLogo() {
+  const logo = localStorage.getItem('b2_logo');
+  if (logo) applyLogo(logo);
+}
+
+// ── Save individual query response ──
+function saveQueryResponse(query, result) {
+  const responses = JSON.parse(localStorage.getItem('b2_responses') || '[]');
+  responses.push({
+    date: new Date().toISOString(),
+    question: query.text,
+    type: query.type,
+    target: query.target,
+    sentiment: result.sentiment,
+    score: result.score,
+    gpt_response: result.gpt_response || '',
+    key_claims: result.key_claims || [],
+    risks: result.risks || [],
+    summary: result.summary || ''
+  });
+  // keep last 500 responses
+  if (responses.length > 500) responses.splice(0, responses.length - 500);
+  localStorage.setItem('b2_responses', JSON.stringify(responses));
+}
+
+function getResponses() {
+  return JSON.parse(localStorage.getItem('b2_responses') || '[]');
+}
+
+// ── Render responses table ──
+function renderResponses() {
+  const responses = getResponses();
+  const search = (document.getElementById('resp-search')?.value || '').toLowerCase();
+  const sentFilter = document.getElementById('resp-filter-sentiment')?.value || '';
+  const typeFilter = document.getElementById('resp-filter-type')?.value || '';
+
+  let filtered = responses.filter(r => {
+    const matchSearch = !search ||
+      r.question.toLowerCase().includes(search) ||
+      r.gpt_response.toLowerCase().includes(search) ||
+      r.target.toLowerCase().includes(search);
+    const matchSent = !sentFilter || r.sentiment === sentFilter;
+    const matchType = !typeFilter || r.type === typeFilter;
+    return matchSearch && matchSent && matchType;
+  }).reverse(); // newest first
+
+  const count = document.getElementById('resp-count');
+  if (count) count.textContent = filtered.length + ' resposta' + (filtered.length !== 1 ? 's' : '');
+
+  const tbody = document.getElementById('resp-table-body');
+  if (!tbody) return;
+
+  if (!filtered.length) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--text3);font-size:12px;font-family:monospace">Nenhuma resposta encontrada</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = filtered.map((r, i) => {
+    const sentColor = r.sentiment === 'positivo' ? 'var(--green)' : r.sentiment === 'negativo' ? 'var(--red)' : 'var(--amber)';
+    const scoreClass = r.score >= 70 ? 'score-high' : r.score >= 45 ? 'score-mid' : 'score-low';
+    const d = new Date(r.date);
+    const dateStr = d.toLocaleDateString('pt-BR', {day:'2-digit',month:'2-digit'}) + '<br>' + d.toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'});
+    const claims = (r.key_claims || []).map(c => `<span class="claim-tag">${c}</span>`).join('');
+    return `<tr>
+      <td style="font-family:monospace;color:var(--text3);font-size:10px">${filtered.length - i}</td>
+      <td style="font-family:monospace;font-size:10px;color:var(--text3);white-space:nowrap">${dateStr}</td>
+      <td><span class="score-pill ${r.type === 'brand' ? 'score-high' : 'badge-blue'}" style="font-size:10px">${r.target}</span></td>
+      <td><span style="color:${sentColor};font-size:11px;font-weight:700">${r.sentiment}</span></td>
+      <td><span class="score-pill ${scoreClass}">${r.score}</span></td>
+      <td>
+        <div class="resp-question">${r.question}</div>
+        <div class="resp-answer">"${r.gpt_response}"</div>
+        ${claims ? '<div class="resp-claims">' + claims + '</div>' : ''}
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+// ── Render SKU timeline ──
+function renderSkuTimeline() {
+  const responses = getResponses();
+  const tabsEl = document.getElementById('sku-timeline-tabs');
+  const contentEl = document.getElementById('sku-timeline-content');
+
+  if (!responses.length) {
+    tabsEl.innerHTML = '';
+    contentEl.innerHTML = '<div style="text-align:center;padding:32px;color:var(--text3);font-size:12px;font-family:monospace">Rode consultas para ver o histórico por SKU</div>';
+    return;
+  }
+
+  // Build target list: brand first then SKUs
+  const targets = [...new Set(responses.map(r => r.target))];
+  const brandTargets = targets.filter(t => t === state.brand);
+  const skuTargets = targets.filter(t => t !== state.brand);
+  const allTargets = [...brandTargets, ...skuTargets];
+
+  // Active tab state
+  if (!window._activeTimelineTarget || !allTargets.includes(window._activeTimelineTarget)) {
+    window._activeTimelineTarget = allTargets[0];
+  }
+
+  // Render tabs
+  tabsEl.innerHTML = allTargets.map(t => `
+    <button class="sku-tab ${t === window._activeTimelineTarget ? 'active' : ''}"
+      onclick="window._activeTimelineTarget='${t.replace(/'/g,"\'")}';renderSkuTimeline()">
+      ${t}
+    </button>`).join('');
+
+  // Render entries for active target
+  const target = window._activeTimelineTarget;
+  const entries = responses.filter(r => r.target === target).reverse();
+
+  if (!entries.length) {
+    contentEl.innerHTML = '<div style="padding:20px;color:var(--text3);font-size:12px;font-family:monospace">Sem respostas para este alvo</div>';
+    return;
+  }
+
+  // Score trend summary
+  const scores = entries.map(e => e.score);
+  const avgScore = Math.round(scores.reduce((a,b) => a+b, 0) / scores.length);
+  const trend = scores.length > 1 ? scores[0] - scores[scores.length-1] : 0;
+  const trendColor = trend >= 0 ? 'var(--green)' : 'var(--red)';
+  const trendLabel = trend > 0 ? '+' + trend + ' pts tendência' : trend < 0 ? trend + ' pts tendência' : 'estável';
+
+  contentEl.innerHTML = `
+    <div style="display:flex;gap:16px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border)">
+      <div style="flex:1">
+        <div style="font-size:11px;color:var(--text3);font-family:monospace;margin-bottom:4px">SCORE MÉDIO</div>
+        <div style="font-size:28px;font-weight:800;color:var(--text)">${avgScore}<span style="font-size:14px;font-weight:400;color:var(--text3)">/100</span></div>
+      </div>
+      <div style="flex:1">
+        <div style="font-size:11px;color:var(--text3);font-family:monospace;margin-bottom:4px">TENDÊNCIA</div>
+        <div style="font-size:18px;font-weight:700;color:${trendColor}">${trendLabel}</div>
+      </div>
+      <div style="flex:1">
+        <div style="font-size:11px;color:var(--text3);font-family:monospace;margin-bottom:4px">RESPOSTAS</div>
+        <div style="font-size:28px;font-weight:800;color:var(--text)">${entries.length}</div>
+      </div>
+    </div>
+    ${entries.map(e => {
+      const sentColor = e.sentiment === 'positivo' ? 'var(--green)' : e.sentiment === 'negativo' ? 'var(--red)' : 'var(--amber)';
+      const d = new Date(e.date);
+      const dateStr = d.toLocaleDateString('pt-BR', {day:'2-digit',month:'2-digit',year:'2-digit'});
+      const timeStr = d.toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'});
+      const claims = (e.key_claims||[]).map(c => `<span class="claim-tag">${c}</span>`).join('');
+      return `<div class="sku-timeline-entry">
+        <div class="timeline-date">${dateStr}<br>${timeStr}</div>
+        <div class="timeline-dot" style="background:${sentColor}"></div>
+        <div class="timeline-body">
+          <div class="timeline-question">${e.question}</div>
+          <div class="timeline-answer">"${e.gpt_response}"</div>
+          ${claims ? '<div class="resp-claims" style="margin-top:6px">' + claims + '</div>' : ''}
+          <div class="timeline-meta">score ${e.score}/100 · ${e.sentiment}</div>
+        </div>
+      </div>`;
+    }).join('')}`;
+}
+
+// ── Export responses to Sheets ──
+async function exportResponsesToSheets() {
+  const url = localStorage.getItem('b2_sheets_url') || '';
+  if (!url) { toast('Configure a URL do Apps Script em Configurações primeiro', 'error'); return; }
+  const responses = getResponses();
+  if (!responses.length) { toast('Sem respostas para exportar', 'error'); return; }
+  try {
+    await fetch(url, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ brand: state.brand, exported_at: new Date().toISOString(), responses })
+    });
+    toast('Respostas enviadas para o Sheets!', 'success');
+  } catch(e) {
+    toast('Erro: ' + e.message, 'error');
+  }
+}
+
+// ── API Key helpers ──
+function saveApiKey(val) {
+  const key = val.trim();
+  localStorage.setItem('b2_apikey', key);
+  updateApiStatus(key);
+}
+
+function updateApiStatus(key) {
+  const dot = document.getElementById('statusDot');
+  const txt = document.getElementById('statusText');
+  if (key && key.startsWith('sk-ant-')) {
+    dot.style.background = 'var(--green)';
+    txt.textContent = 'Chave configurada';
+  } else if (key) {
+    dot.style.background = 'var(--amber)';
+    txt.textContent = 'Chave invalida?';
+  } else {
+    dot.style.background = 'var(--red)';
+    txt.textContent = 'Sem chave de API';
+  }
+}
+
+function toggleKeyVisibility() {
+  const inp = document.getElementById('apiKeyInput');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+
+function loadApiKey() {
+  const key = localStorage.getItem('b2_apikey') || '';
+  document.getElementById('apiKeyInput').value = key;
+  updateApiStatus(key);
+}
+
+// ── Swipe gesture for sidebar (tablet/mobile) ──
+(function() {
+  let startX = 0, startY = 0;
+  document.addEventListener('touchstart', e => {
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+  }, { passive: true });
+  document.addEventListener('touchend', e => {
+    if (window.innerWidth > 768) return;
+    const dx = e.changedTouches[0].clientX - startX;
+    const dy = Math.abs(e.changedTouches[0].clientY - startY);
+    if (dy > 60) return; // mostly vertical swipe, ignore
+    if (dx > 60 && startX < 30) toggleSidebar();  // swipe right from edge = open
+    if (dx < -60) closeSidebar();                  // swipe left = close
+  }, { passive: true });
+})();
+
+// ── Init ──
+loadConfig();
+loadApiKey();
+loadLogo();
+
+// Pre-populate default queries textarea on config page load
+window.defaultQueries = defaultQueries;
+</script>
+</body>
+</html>
